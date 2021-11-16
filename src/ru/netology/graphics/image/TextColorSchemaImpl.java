@@ -1,6 +1,4 @@
-package ru.netology.graphics;
-
-import ru.netology.graphics.image.TextColorSchema;
+package ru.netology.graphics.image;
 
 public class TextColorSchemaImpl implements TextColorSchema {
 

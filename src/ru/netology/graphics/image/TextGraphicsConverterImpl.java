@@ -1,33 +1,37 @@
 package ru.netology.graphics.image;
 
-import ru.netology.graphics.TextColorSchemaImpl;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+
 public class TextGraphicsConverterImpl implements TextGraphicsConverter {
     private int maxHeight;
     private int maxWidth;
     private double maxRatio;
+    TextColorSchema schema;
 
     public int[] newSizes(int width, int height) {
-        double widthRalation = (double) maxWidth / width;
-        double heightRalation = (double) maxHeight / height;
         int[] sizes = new int[2];
-
-        if (widthRalation < heightRalation) {
-            sizes[0] = maxWidth;
-            sizes[1] = (int) Math.round(height * widthRalation);
+        if ((maxHeight < height && maxHeight !=0)||(maxWidth < width && maxWidth != 0)) {
+            double widthRalation = (double) maxWidth / width;
+            double heightRalation = (double) maxHeight / height;
+            if (widthRalation < heightRalation) {
+                sizes[0] = (int) Math.round(width * heightRalation);
+                sizes[1] = maxHeight;
+            } else {
+                sizes[0] = maxWidth;
+                sizes[1] = (int) Math.round(height * widthRalation);
+            }
+            return sizes;
         } else {
-            sizes[0] = (int) Math.round(width * heightRalation);
-            sizes[1] = maxHeight;
+            return sizes = new int[]{width, height};
         }
-        return sizes;
     }
 
     @Override
@@ -41,26 +45,26 @@ public class TextGraphicsConverterImpl implements TextGraphicsConverter {
             }
         }
 
-        Image scaledImage;
         int newHeight;
         int newWidth;
-        if ((maxHeight > 0) || (maxWidth > 0)) {
+        Image scaledImage;
+        if (maxHeight != 0 || maxWidth != 0) {
             int[] sizes = newSizes(img.getWidth(), img.getHeight());
             newWidth = sizes[0];
             newHeight = sizes[1];
             scaledImage = img.getScaledInstance(newWidth, newHeight, BufferedImage.SCALE_SMOOTH);
-
         } else {
             newWidth = img.getWidth();
             newHeight = img.getHeight();
             scaledImage = img;
         }
+        if (schema == null) {
+            schema = new TextColorSchemaImpl();
+        }
 
-        TextColorSchemaImpl schema = new TextColorSchemaImpl();
         BufferedImage bwImg = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_BYTE_GRAY);
         Graphics2D graphics = bwImg.createGraphics();
         graphics.drawImage(scaledImage, 0, 0, null);
-        ImageIO.write(bwImg, "png", new File("out.png"));
         WritableRaster bwRaster = bwImg.getRaster();
         int[] tempArray = new int[3];
         char[][] charArray = new char[bwRaster.getHeight()][bwRaster.getWidth()];
@@ -100,6 +104,6 @@ public class TextGraphicsConverterImpl implements TextGraphicsConverter {
 
     @Override
     public void setTextColorSchema(TextColorSchema schema) {
-
+        this.schema = schema;
     }
 }
