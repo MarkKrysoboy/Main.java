@@ -39,10 +39,12 @@ public class TextGraphicsConverterImpl implements TextGraphicsConverter {
         BufferedImage img = ImageIO.read(new URL(url));
 
         if (maxRatio != 0) {
-            double currentRatio = Math.abs(img.getWidth() / img.getHeight());
-            if (maxRatio < currentRatio) {
+            double currentRatio = (double) img.getWidth() / img.getHeight();
+            double currentRatio2 = (double) img.getHeight()/ img.getWidth();
+            if (maxRatio < currentRatio || maxRatio < currentRatio2) {
                 throw new BadImageSizeException(currentRatio, maxRatio);
             }
+
         }
 
         int newHeight;
